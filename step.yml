@@ -67,44 +67,74 @@ toolkit:
 
 
 inputs:
-  - bitbucket_access_token: $BITBUCKET_ACCESS_TOKEN
+  # General inputs
+  - access_token: $BITBUCKET_ACCESS_TOKEN
     opts:
       title: Bitbucket access token
       is_required: true
       is_sensitive: true
-  - bitbucket_base_url: $BITBUCKET_BASE_URL
+  - base_url: $BITBUCKET_BASE_URL
     opts:
       title: Bitbucket base url
       is_required: true
-  - bitbucket_project_key: $BITBUCKET_PROJECT_KEY
+  - project_key: $BITBUCKET_PROJECT_KEY
     opts:
       title: Bitbucket project url
       is_required: true
-  - bitbucket_repository_slug: $BITRISEIO_GIT_REPOSITORY_SLUG
+  - repository_slug: $BITRISEIO_GIT_REPOSITORY_SLUG
     opts:
       title: Bitbucket repository slug
       is_required: true
       is_dont_change_value: true
-  - bitbucket_pr: $BITRISE_PULL_REQUEST
+  - pr: $BITRISE_PULL_REQUEST
     opts:
       title: Bitbucket pull request id
       is_required: true
       is_dont_change_value: true
-  - bitbucket_pr_comment_state:
+  # PR inputs
+  - create_pr: "false"
     opts:
-      title: Comment State
+      title: Create PR
+      description: Whether to create a PR
+      value_options: ["true", "false"]
+      category: PR
+  - pr_title:
+    opts:
+      title: Title
+      description: Title of the PR
+      category: PR
+  - pr_source_branch: $BITRISE_GIT_BRANCH
+    opts:
+      title: Source branch
+      description: Source branch of the PR
+      category: PR
+  - pr_target_branch: "main"
+    opts:
+      title: Source branch
+      description: Target branch of the PR
+      category: PR
+  # PR comment inputs
+  - create_pr_comment: "false"
+    opts:
+      title: Create PR comment
+      description: Whether to create a PR comment
+      value_options: ["true", "false"]
+      category: Comment
+  - pr_comment_state: "OPEN"
+    opts:
+      title: State
       value_options: ["OPEN", "PENDING", "RESOLVED"]
-      category: pull_request_comment
-  - bitbucket_pr_comment_severity:
+      category: Comment
+  - pr_comment_severity: "NORMAL"
     opts:
-      title: Comment Severity
+      title: Severity
       value_options: ["NORMAL", "BLOCKER"]
-      category: pull_request_comment
-  - bitbucket_pr_comment_skip_if_contains:
+      category: Comment
+  - pr_comment_skip_if_contains:
     opts:
       title: Skip comment creation if comment with given text already exists
-      category: pull_request_comment
-  - bitbucket_pr_comment:
+      category: Comment
+  - pr_comment:
     opts:
       title: Comment
-      category: pull_request_comment
+      category: Comment

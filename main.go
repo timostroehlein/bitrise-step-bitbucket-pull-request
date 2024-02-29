@@ -3,48 +3,87 @@ package main
 import (
 	"fmt"
 	"os"
+	"strconv"
 )
 
 func main() {
-	bitbucket_access_token := os.Getenv("bitbucket_access_token")
-	bitbucket_base_url := os.Getenv("bitbucket_base_url")
-	bitbucket_project_key := os.Getenv("bitbucket_project_key")
-	bitbucket_repository_slug := os.Getenv("bitbucket_repository_slug")
-	bitbucket_pr := os.Getenv("bitbucket_pr")
-	bitbucket_pr_comment_state := os.Getenv("bitbucket_pr_comment_state")
-	bitbucket_pr_comment_severity := os.Getenv("bitbucket_pr_comment_severity")
-	bitbucket_pr_comment_skip_if_contains := os.Getenv("bitbucket_pr_comment_skip_if_contains")
-	bitbucket_pr_comment := os.Getenv("bitbucket_pr_comment")
+	// General inputs
+	access_token := os.Getenv("access_token")
+	base_url := os.Getenv("base_url")
+	project_key := os.Getenv("project_key")
+	repository_slug := os.Getenv("repository_slug")
+	pr := os.Getenv("pr")
+	// PR inputs
+	create_pr, _ := strconv.ParseBool(os.Getenv("create_pr"))
+	pr_title := os.Getenv("pr_title")
+	pr_source_branch := os.Getenv("pr_source_branch")
+	pr_target_branch := os.Getenv("pr_target_branch")
+	// PR comment inputs
+	create_pr_comment, _ := strconv.ParseBool(os.Getenv("create_pr_comment"))
+	pr_comment_state := os.Getenv("pr_comment_state")
+	pr_comment_severity := os.Getenv("pr_comment_severity")
+	pr_comment_skip_if_contains := os.Getenv("pr_comment_skip_if_contains")
+	pr_comment := os.Getenv("pr_comment")
 
 	// Create url
-	base_url := fmt.Sprintf(
+	bitbucket_url := fmt.Sprintf(
 		"%s/rest/api/latest/projects/%s/repos/%s",
-		bitbucket_base_url,
-		bitbucket_project_key,
-		bitbucket_repository_slug,
+		base_url,
+		project_key,
+		repository_slug,
 	)
 
-	// Check whether the given comment already exists
-	comments, err := getComments(bitbucket_access_token, base_url, bitbucket_pr)
-	if err != nil {
-		fmt.Println("Error:", err)
-		os.Exit(1)
-	}
-	if bitbucket_pr_comment_skip_if_contains != "" && doesCommentExist(comments.Values, bitbucket_pr_comment_skip_if_contains) {
-		fmt.Println("Skipping: already exists")
-		os.Exit(0)
+	if create_pr {
+		req_body := PullRequest{
+			Title: pr_title,
+			FromRef: Ref{
+				Id: "refs/heads/" + pr_source_branch,
+			},
+			ToRef: Ref{
+				Id: "refs/heads/" + pr_target_branch,
+			},
+		}
+		fmt.Println("Creating pull request")
+		pull_request, err := createPullRequest(access_token, bitbucket_url, req_body)
+		if err != nil {
+			fmt.Println("Error:", err)
+			os.Exit(1)
+		}
+		if pr == "" {
+			pr = strconv.Itoa(pull_request.Id)
+		}
 	}
 
-	// Create new comment
-	reqBody := AddComment{
-		Severity: bitbucket_pr_comment_severity,
-		State:    bitbucket_pr_comment_state,
-		Text:     bitbucket_pr_comment,
-	}
-	err = addComment(bitbucket_access_token, base_url, bitbucket_pr, reqBody)
-	if err != nil {
-		fmt.Println("Error:", err)
-		os.Exit(1)
+	if create_pr_comment {
+		if pr == "" {
+			fmt.Println("Cannot create PR comment, missing id, make sure the given PR exists")
+			os.Exit(1)
+		}
+
+		// Check whether the given comment already exists
+		fmt.Println("Requesting comments")
+		comments, err := getComments(access_token, bitbucket_url, pr)
+		if err != nil {
+			fmt.Println("Error:", err)
+			os.Exit(1)
+		}
+		if pr_comment_skip_if_contains != "" && doesCommentExist(comments.Values, pr_comment_skip_if_contains) {
+			fmt.Println("Skipping comment creation: already exists")
+			os.Exit(0)
+		}
+
+		// Create new comment
+		req_body := AddComment{
+			Severity: pr_comment_severity,
+			State:    pr_comment_state,
+			Text:     pr_comment,
+		}
+		fmt.Println("Adding comment")
+		err = addComment(access_token, bitbucket_url, pr, req_body)
+		if err != nil {
+			fmt.Println("Error:", err)
+			os.Exit(1)
+		}
 	}
 
 	// --- Step Outputs: Export Environment Variables for other Steps:

@@ -1,114 +1,88 @@
 package main
 
 type CreateBranch struct {
-	Name     string `json:"name"`
-	CommitID int    `json:"startPoint"`
+	Name     string `json:"name,omitempty"`
+	CommitID int    `json:"startPoint,omitempty"`
 }
 
 type CreateBranchResp struct {
-	Default         bool   `json:"default"`
-	DisplayID       string `json:"displayId"`
-	LatestCommit    string `json:"latestCommit"`
-	LatestChangeset string `json:"latestChangeset"`
-	ID              string `json:"id"`
+	Default         bool   `json:"default,omitempty"`
+	DisplayID       string `json:"displayId,omitempty"`
+	LatestCommit    string `json:"latestCommit,omitempty"`
+	LatestChangeset string `json:"latestChangeset,omitempty"`
+	ID              string `json:"id,omitempty"`
 }
 
 type PullRequest struct {
-	Closed          bool          `json:"closed"`
-	Version         int           `json:"version"`
-	Open            bool          `json:"open"`
-	Id              int           `json:"id"`
-	State           string        `json:"state"`
-	Locked          bool          `json:"locked"`
-	HtmlDescription string        `json:"htmlDescription"`
-	UpdatedDate     int           `json:"updatedDate"`
-	CreatedDate     int           `json:"createdDate"`
-	ClosedDate      int           `json:"closedDate"`
-	Participants    []Participant `json:"participants"`
-	Reviewers       []Participant `json:"reviewers"`
-	Draft           bool          `json:"draft"`
-	ToRef           Ref           `json:"toRef"`
-	FromRef         Ref           `json:"fromRef"`
-	Title           string        `json:"title"`
-	Description     string        `json:"description"`
-	Links           struct{}      `json:"links"`
-}
-
-type User struct {
-	DisplayName  string   `json:"displayName"`
-	Name         string   `json:"name"`
-	Type         string   `json:"type"`
-	Active       bool     `json:"active"`
-	EmailAddress string   `json:"emailAddress"`
-	Slug         string   `json:"slug"`
-	Links        struct{} `json:"links"`
-	AvatarUrl    string   `json:"avatarUrl"`
-}
-
-type Repository struct {
-	Name    string   `json:"name"`
-	ScmId   string   `json:"scmId"`
-	Slug    string   `json:"slug"`
-	Project Project  `json:"project"`
-	Links   struct{} `json:"links"`
-}
-
-type Project struct {
-	Key       string   `json:"key"`
-	AvatarUrl string   `json:"avatarUrl"`
-	Avatar    string   `json:"avatar"`
-	Links     struct{} `json:"links"`
-}
-
-type Participant struct {
-	LastReviewedCommit string `json:"lastReviewedCommit"`
-	User               User   `json:"user"`
-	Role               string `json:"role"`
-	Status             string `json:"status"`
-	Approved           bool   `json:"approved"`
+	Closed          bool     `json:"closed,omitempty"`
+	Version         int      `json:"version,omitempty"`
+	Open            bool     `json:"open,omitempty"`
+	Id              int      `json:"id,omitempty"`
+	State           string   `json:"state,omitempty"`
+	Locked          bool     `json:"locked,omitempty"`
+	HtmlDescription string   `json:"htmlDescription,omitempty"`
+	UpdatedDate     int      `json:"updatedDate,omitempty"`
+	CreatedDate     int      `json:"createdDate,omitempty"`
+	ClosedDate      int      `json:"closedDate,omitempty"`
+	Draft           bool     `json:"draft,omitempty"`
+	ToRef           Ref      `json:"toRef,omitempty"`
+	FromRef         Ref      `json:"fromRef,omitempty"`
+	Title           string   `json:"title,omitempty"`
+	Description     string   `json:"description,omitempty"`
+	Links           struct{} `json:"links,omitempty"`
 }
 
 type Ref struct {
-	Id           string     `json:"id"`
-	Type         string     `json:"type"`
-	DisplayId    string     `json:"displayId"`
-	LatestCommit string     `json:"latestCommit"`
-	Repository   Repository `json:"repository"`
+	Id           string `json:"id,omitempty"`
+	Type         string `json:"type,omitempty"`
+	DisplayId    string `json:"displayId,omitempty"`
+	LatestCommit string `json:"latestCommit,omitempty"`
+}
+
+type BitbucketError struct {
+	Errors []PullRequestError `json:"errors,omitempty"`
+}
+
+type PullRequestError struct {
+	Context             string      `json:"context,omitempty"`
+	Message             string      `json:"message,omitempty"`
+	ExceptionName       string      `json:"exceptionName,omitempty"`
+	ExistingPullRequest PullRequest `json:"existingPullRequest,omitempty"`
 }
 
 type AddComment struct {
-	Severity       string `json:"severity"`
-	Version        int    `json:"version"`
-	ID             int    `json:"id"`
-	State          string `json:"state"`
-	ThreadResolved bool   `json:"threadResolved"`
-	Text           string `json:"text"`
+	Severity       string `json:"severity,omitempty"`
+	Version        int    `json:"version,omitempty"`
+	ID             int    `json:"id,omitempty"`
+	State          string `json:"state,omitempty"`
+	ThreadResolved bool   `json:"threadResolved,omitempty"`
+	Text           string `json:"text,omitempty"`
 }
 
 type AddCommentResp struct {
-	Size       int       `json:"size"`
-	Limit      int       `json:"limit"`
-	IsLastPage bool      `json:"isLastPage"`
-	Values     []Comment `json:"values"`
+	Size       int       `json:"size,omitempty"`
+	Limit      int       `json:"limit,omitempty"`
+	IsLastPage bool      `json:"isLastPage,omitempty"`
+	Values     []Comment `json:"values,omitempty"`
 }
 
 type Comment struct {
-	ID          int    `json:"id"`
-	Version     int    `json:"version"`
-	Text        string `json:"text"`
-	Author      Author `json:"author"`
-	CreatedDate int64  `json:"createdDate"`
-	UpdatedDate int64  `json:"updatedDate"`
-	Severity    string `json:"severity"`
-	State       string `json:"state"`
+	ID          int    `json:"id,omitempty"`
+	Version     int    `json:"version,omitempty"`
+	Text        string `json:"text,omitempty"`
+	Author      Author `json:"author,omitempty"`
+	CreatedDate int64  `json:"createdDate,omitempty"`
+	UpdatedDate int64  `json:"updatedDate,omitempty"`
+	Severity    string `json:"severity,omitempty"`
+	State       string `json:"state,omitempty"`
 }
 
 type Author struct {
-	Name         string `json:"name"`
-	EmailAddress string `json:"emailAddress"`
-	ID           int    `json:"id"`
-	DisplayName  string `json:"displayName"`
-	Active       bool   `json:"active"`
-	Slug         string `json:"slug"`
-	Type         string `json:"type"`
+	Name         string `json:"name,omitempty"`
+	EmailAddress string `json:"emailAddress,omitempty"`
+	ID           int    `json:"id,omitempty"`
+	DisplayName  string `json:"displayName,omitempty"`
+	Active       bool   `json:"active,omitempty"`
+	Slug         string `json:"slug,omitempty"`
+	Type         string `json:"type,omitempty"`
 }

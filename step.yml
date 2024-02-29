@@ -1,0 +1,110 @@
+#
+# A couple of useful guides & docs:
+#
+# - Main Bitrise CLI docs: https://github.com/bitrise-io/bitrise/tree/master/_docs
+# - Step Development Guideline: https://github.com/bitrise-io/bitrise/blob/master/_docs/step-development-guideline.md
+# - Bitrise.yml format spec: https://github.com/bitrise-io/bitrise/blob/master/_docs/bitrise-yml-format-spec.md
+# - Bitrise docs: http://devcenter.bitrise.io/
+# - Bitrise CLI guides: http://devcenter.bitrise.io/bitrise-cli/
+
+title: |-
+  Bitbucket API
+summary: |
+  Communicate with bitbucket api
+description: |
+  Communicate with bitbucket api
+website: https://github.com/timostroehlein/bitrise-step-bitbucket-pull-request
+source_code_url: https://github.com/timostroehlein/bitrise-step-bitbucket-pull-request
+support_url: https://github.com/timostroehlein/bitrise-step-bitbucket-pull-request
+
+# If this step should be available only for certain project types
+# just uncomment this `project_type_tags` section and include all the
+# project types supported by the step. If the step can be used for all
+# project types then you can just remove this section.
+# If no `project_type_tags` specified (or specified as an empty array)
+# that means the step can be used for any project type.
+# You can find more information about project type tags in the Step Development Guideline:
+# https://github.com/bitrise-io/bitrise/blob/master/_docs/step-development-guideline.md
+#
+# project_type_tags:
+#   - ios
+#   - macos
+#   - android
+#   - xamarin
+#   - react-native
+#   - cordova
+#   - ionic
+#   - flutter
+
+# Type tags are used for categorizing steps, for easier step discovery in Step Libraries.
+# You can find more information about type tags in the Step Development Guideline:
+# https://github.com/bitrise-io/bitrise/blob/master/_docs/step-development-guideline.md
+type_tags:
+  - notification
+
+# These properties define whether a Step is run in a given Workflow or not.
+# You can find more information about this in the documentation here:
+# https://devcenter.bitrise.io/en/steps-and-workflows/developing-your-own-bitrise-step/developing-a-new-step.html#setting-conditions-for-running-the-step
+#
+# is_always_run: false
+# is_skippable: false
+# run_if: ""
+
+# Use the `deps` property to declare dependencies that you can fetch from an OS dependency manager.
+# You can find more information about this in the documentation here:
+# https://devcenter.bitrise.io/en/steps-and-workflows/developing-your-own-bitrise-step/developing-a-new-step.html#submodules-and-step-dependencies
+#
+# deps:
+#   brew:
+#   - name: cmake
+#   apt_get:
+#   - name: cmake
+
+
+toolkit:
+  go:
+    package_name: github.com/timostroehlein/bitrise-step-bitbucket-pull-request
+
+
+inputs:
+  - bitbucket_access_token: $BITBUCKET_ACCESS_TOKEN
+    opts:
+      title: Bitbucket access token
+      is_required: true
+      is_sensitive: true
+  - bitbucket_base_url: $BITBUCKET_BASE_URL
+    opts:
+      title: Bitbucket base url
+      is_required: true
+  - bitbucket_project_key: $BITBUCKET_PROJECT_KEY
+    opts:
+      title: Bitbucket project url
+      is_required: true
+  - bitbucket_repository_slug: $BITRISEIO_GIT_REPOSITORY_SLUG
+    opts:
+      title: Bitbucket repository slug
+      is_required: true
+      is_dont_change_value: true
+  - bitbucket_pr: $BITRISE_PULL_REQUEST
+    opts:
+      title: Bitbucket pull request id
+      is_required: true
+      is_dont_change_value: true
+  - bitbucket_pr_comment_state:
+    opts:
+      title: Comment State
+      value_options: ["OPEN", "PENDING", "RESOLVED"]
+      category: pull_request_comment
+  - bitbucket_pr_comment_severity:
+    opts:
+      title: Comment Severity
+      value_options: ["NORMAL", "BLOCKER"]
+      category: pull_request_comment
+  - bitbucket_pr_comment_skip_if_contains:
+    opts:
+      title: Skip comment creation if comment with given text already exists
+      category: pull_request_comment
+  - bitbucket_pr_comment:
+    opts:
+      title: Comment
+      category: pull_request_comment

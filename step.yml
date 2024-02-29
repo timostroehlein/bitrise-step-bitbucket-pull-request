@@ -10,9 +10,9 @@
 title: |-
   Bitbucket Pull Request
 summary: |
-  Create Bitbucket pull requests and add comments
+  Create Bitbucket pull requests and add comment
 description: |
-  Create Bitbucket pull requests and add comments
+  Create Bitbucket pull requests and add comment
 website: https://github.com/timostroehlein/bitrise-step-bitbucket-pull-request
 source_code_url: https://github.com/timostroehlein/bitrise-step-bitbucket-pull-request
 support_url: https://github.com/timostroehlein/bitrise-step-bitbucket-pull-request

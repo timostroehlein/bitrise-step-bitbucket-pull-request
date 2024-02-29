@@ -8,11 +8,11 @@
 # - Bitrise CLI guides: http://devcenter.bitrise.io/bitrise-cli/
 
 title: |-
-  Bitbucket API
+  Bitbucket Pull Request
 summary: |
-  Communicate with bitbucket api
+  Create Bitbucket pull requests and add comments
 description: |
-  Communicate with bitbucket api
+  Create Bitbucket pull requests and add comments
 website: https://github.com/timostroehlein/bitrise-step-bitbucket-pull-request
 source_code_url: https://github.com/timostroehlein/bitrise-step-bitbucket-pull-request
 support_url: https://github.com/timostroehlein/bitrise-step-bitbucket-pull-request
@@ -95,29 +95,29 @@ inputs:
   - create_pr: "false"
     opts:
       title: Create PR
-      description: Whether to create a PR
+      summary: Whether to create a PR
       value_options: ["true", "false"]
       category: PR
   - pr_title:
     opts:
       title: Title
-      description: Title of the PR
+      summary: Title of the PR
       category: PR
   - pr_source_branch: $BITRISE_GIT_BRANCH
     opts:
       title: Source branch
-      description: Source branch of the PR
+      summary: Source branch of the PR
       category: PR
   - pr_target_branch: "main"
     opts:
-      title: Source branch
-      description: Target branch of the PR
+      title: Target branch
+      summary: Target branch of the PR
       category: PR
   # PR comment inputs
   - create_pr_comment: "false"
     opts:
       title: Create PR comment
-      description: Whether to create a PR comment
+      summary: Whether to create a PR comment
       value_options: ["true", "false"]
       category: Comment
   - pr_comment_state: "OPEN"
@@ -132,7 +132,7 @@ inputs:
       category: Comment
   - pr_comment_skip_if_contains:
     opts:
-      title: Skip comment creation if comment with given text already exists
+      title: Skip if comment with given text already exists
       category: Comment
   - pr_comment:
     opts:

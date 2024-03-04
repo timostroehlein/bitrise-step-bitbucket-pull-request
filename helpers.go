@@ -2,10 +2,10 @@ package main
 
 import "strings"
 
-func doesCommentExist(comments []Comment, comment_text string) (bool, Comment) {
+func doesCommentExist(comments []PullRequestActivity, comment_text string) (bool, Comment) {
 	for _, item := range comments {
-		if strings.Contains(item.Text, comment_text) {
-			return true, item
+		if item.Action == "COMMENTED" && strings.Contains(item.Comment.Text, comment_text) {
+			return true, item.Comment
 		}
 	}
 	return false, Comment{}

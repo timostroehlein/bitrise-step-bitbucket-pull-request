@@ -60,24 +60,33 @@ type AddComment struct {
 }
 
 type AddCommentResp struct {
-	Size       int       `json:"size,omitempty"`
-	Limit      int       `json:"limit,omitempty"`
-	IsLastPage bool      `json:"isLastPage,omitempty"`
-	Values     []Comment `json:"values,omitempty"`
+	Size       int                   `json:"size,omitempty"`
+	Limit      int                   `json:"limit,omitempty"`
+	IsLastPage bool                  `json:"isLastPage,omitempty"`
+	Values     []PullRequestActivity `json:"values,omitempty"`
+}
+
+type PullRequestActivity struct {
+	ID            int     `json:"id"`
+	CreatedDate   int     `json:"createdDate,omitempty"`
+	User          User    `json:"user,omitempty"`
+	Action        string  `json:"action,omitempty"`
+	CommentAction string  `json:"commentAction,omitempty"`
+	Comment       Comment `json:"comment,omitempty"`
 }
 
 type Comment struct {
 	ID          int    `json:"id,omitempty"`
 	Version     int    `json:"version,omitempty"`
 	Text        string `json:"text,omitempty"`
-	Author      Author `json:"author,omitempty"`
+	Author      User   `json:"author,omitempty"`
 	CreatedDate int64  `json:"createdDate,omitempty"`
 	UpdatedDate int64  `json:"updatedDate,omitempty"`
 	Severity    string `json:"severity,omitempty"`
 	State       string `json:"state,omitempty"`
 }
 
-type Author struct {
+type User struct {
 	Name         string `json:"name,omitempty"`
 	EmailAddress string `json:"emailAddress,omitempty"`
 	ID           int    `json:"id,omitempty"`

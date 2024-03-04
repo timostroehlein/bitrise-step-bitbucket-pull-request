@@ -74,7 +74,7 @@ func createPullRequest(access_token string, base_url string, pull_request PullRe
 
 func getComments(access_token string, base_url string, pull_request string) (AddCommentResp, error) {
 	get_comments_url := fmt.Sprintf(
-		"%s/pull-requests/%s/blocker-comments",
+		"%s/pull-requests/%s/activities",
 		base_url,
 		pull_request,
 	)

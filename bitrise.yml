@@ -94,7 +94,7 @@ workflows:
         - pr_target_branch: main
         - create_pr_comment: true
         - pr_comment_state: OPEN
-        - pr_comment_severity: BLOCKER
+        - pr_comment_severity: NORMAL
         - pr_comment_match_action: "UPDATE"
         - pr_comment_match_string: "BITRISE"
         - pr_comment: "BITRISE: Comment created by bitrise"

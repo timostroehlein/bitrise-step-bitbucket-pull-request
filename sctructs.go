@@ -52,8 +52,8 @@ type PullRequestError struct {
 
 type AddComment struct {
 	Severity       string `json:"severity,omitempty"`
-	Version        int    `json:"version,omitempty"`
-	ID             int    `json:"id,omitempty"`
+	Version        int    `json:"version"`
+	ID             int    `json:"id"`
 	State          string `json:"state,omitempty"`
 	ThreadResolved bool   `json:"threadResolved,omitempty"`
 	Text           string `json:"text,omitempty"`

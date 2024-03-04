@@ -111,3 +111,17 @@ func addComment(access_token string, base_url string, pull_request string, comme
 	}
 	return nil
 }
+
+func updateComment(access_token string, base_url string, pull_request string, comment_id string, comment AddComment) error {
+	update_comment_url := fmt.Sprintf(
+		"%s/pull-requests/%s/comments/%s",
+		base_url,
+		pull_request,
+		comment_id,
+	)
+	_, err := httpRequest("PUT", access_token, update_comment_url, comment)
+	if err != nil {
+		return err
+	}
+	return nil
+}

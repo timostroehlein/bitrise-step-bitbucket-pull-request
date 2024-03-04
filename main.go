@@ -22,7 +22,8 @@ func main() {
 	create_pr_comment, _ := strconv.ParseBool(os.Getenv("create_pr_comment"))
 	pr_comment_state := os.Getenv("pr_comment_state")
 	pr_comment_severity := os.Getenv("pr_comment_severity")
-	pr_comment_skip_if_contains := os.Getenv("pr_comment_skip_if_contains")
+	pr_comment_match_action := os.Getenv("pr_comment_match_action")
+	pr_comment_match_string := os.Getenv("pr_comment_match_string")
 	pr_comment := os.Getenv("pr_comment")
 
 	// Create url
@@ -67,22 +68,41 @@ func main() {
 			fmt.Println("Error:", err)
 			os.Exit(1)
 		}
-		if pr_comment_skip_if_contains != "" && doesCommentExist(comments.Values, pr_comment_skip_if_contains) {
-			fmt.Println("Skipping comment creation: already exists")
-			os.Exit(0)
-		}
 
-		// Create new comment
-		req_body := AddComment{
-			Severity: pr_comment_severity,
-			State:    pr_comment_state,
-			Text:     pr_comment,
-		}
-		fmt.Println("Adding comment")
-		err = addComment(access_token, bitbucket_url, pr, req_body)
-		if err != nil {
-			fmt.Println("Error:", err)
-			os.Exit(1)
+		comment_exists, existing_comment := doesCommentExist(comments.Values, pr_comment_match_string)
+		if pr_comment_match_string != "" && comment_exists {
+			if pr_comment_match_action == "SKIP" {
+				fmt.Println("Skipping comment creation: already exists")
+				os.Exit(0)
+			}
+
+			// Update existing comment
+			req_body := AddComment{
+				Severity: pr_comment_severity,
+				State:    pr_comment_state,
+				Text:     pr_comment,
+				ID:       existing_comment.ID,
+				Version:  existing_comment.Version,
+			}
+			fmt.Println("Updating existing comment")
+			err = updateComment(access_token, bitbucket_url, pr, strconv.Itoa(existing_comment.ID), req_body)
+			if err != nil {
+				fmt.Println("Error:", err)
+				os.Exit(1)
+			}
+		} else {
+			// Create new comment
+			req_body := AddComment{
+				Severity: pr_comment_severity,
+				State:    pr_comment_state,
+				Text:     pr_comment,
+			}
+			fmt.Println("Adding comment")
+			err = addComment(access_token, bitbucket_url, pr, req_body)
+			if err != nil {
+				fmt.Println("Error:", err)
+				os.Exit(1)
+			}
 		}
 	}
 

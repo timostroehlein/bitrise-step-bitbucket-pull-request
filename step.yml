@@ -79,7 +79,7 @@ inputs:
       is_required: true
   - project_key: $BITBUCKET_PROJECT_KEY
     opts:
-      title: Bitbucket project url
+      title: Bitbucket project key
       is_required: true
   - repository_slug: $BITRISEIO_GIT_REPOSITORY_SLUG
     opts:
@@ -130,9 +130,16 @@ inputs:
       title: Severity
       value_options: ["NORMAL", "BLOCKER"]
       category: Comment
-  - pr_comment_skip_if_contains:
+  - pr_comment_match_action: "SKIP"
     opts:
-      title: Skip if comment with given text already exists
+      title: Match action
+      summary: Whether to skip or update the comment if it already exists
+      value_options: ["SKIP", "UPDATE"]
+      category: Comment
+  - pr_comment_match_string:
+    opts:
+      title: Match string
+      summary: String to match with existing comments, used to determine whether the comment already exists
       category: Comment
   - pr_comment:
     opts:

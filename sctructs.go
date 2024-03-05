@@ -14,22 +14,31 @@ type CreateBranchResp struct {
 }
 
 type PullRequest struct {
-	Closed          bool     `json:"closed,omitempty"`
-	Version         int      `json:"version,omitempty"`
-	Open            bool     `json:"open,omitempty"`
-	Id              int      `json:"id,omitempty"`
-	State           string   `json:"state,omitempty"`
-	Locked          bool     `json:"locked,omitempty"`
-	HtmlDescription string   `json:"htmlDescription,omitempty"`
-	UpdatedDate     int      `json:"updatedDate,omitempty"`
-	CreatedDate     int      `json:"createdDate,omitempty"`
-	ClosedDate      int      `json:"closedDate,omitempty"`
-	Draft           bool     `json:"draft,omitempty"`
-	ToRef           Ref      `json:"toRef,omitempty"`
-	FromRef         Ref      `json:"fromRef,omitempty"`
-	Title           string   `json:"title,omitempty"`
-	Description     string   `json:"description,omitempty"`
-	Links           struct{} `json:"links,omitempty"`
+	Closed          bool       `json:"closed,omitempty"`
+	Version         *int       `json:"version"`
+	Open            bool       `json:"open,omitempty"`
+	Id              int        `json:"id"`
+	State           string     `json:"state,omitempty"`
+	Locked          bool       `json:"locked,omitempty"`
+	HtmlDescription string     `json:"htmlDescription,omitempty"`
+	UpdatedDate     int        `json:"updatedDate"`
+	CreatedDate     int        `json:"createdDate"`
+	ClosedDate      int        `json:"closedDate"`
+	Reviewers       []Reviewer `json:"reviewers"`
+	Draft           bool       `json:"draft,omitempty"`
+	ToRef           Ref        `json:"toRef,omitempty"`
+	FromRef         Ref        `json:"fromRef,omitempty"`
+	Title           string     `json:"title,omitempty"`
+	Description     string     `json:"description,omitempty"`
+	Links           struct{}   `json:"links,omitempty"`
+}
+
+type Reviewer struct {
+	LastReviewedCommit string `json:"lastReviewedCommit,omitempty"`
+	User               User   `json:"user,omitempty"`
+	Role               string `json:"role,omitempty"`
+	Status             string `json:"status,omitempty"`
+	Approved           bool   `json:"approved,omitempty"`
 }
 
 type Ref struct {
@@ -87,11 +96,30 @@ type Comment struct {
 }
 
 type User struct {
-	Name         string `json:"name,omitempty"`
-	EmailAddress string `json:"emailAddress,omitempty"`
-	ID           int    `json:"id,omitempty"`
-	DisplayName  string `json:"displayName,omitempty"`
-	Active       bool   `json:"active,omitempty"`
-	Slug         string `json:"slug,omitempty"`
-	Type         string `json:"type,omitempty"`
+	Name         string   `json:"name,omitempty"`
+	EmailAddress string   `json:"emailAddress,omitempty"`
+	ID           int      `json:"id"`
+	DisplayName  string   `json:"displayName,omitempty"`
+	Active       bool     `json:"active,omitempty"`
+	Slug         string   `json:"slug,omitempty"`
+	Type         string   `json:"type,omitempty"`
+	Links        struct{} `json:"links,omitempty"`
+}
+
+type RefMatcher struct {
+	Id   string `json:"id,omitempty"`
+	Type struct {
+		Id   string `json:"id,omitempty"`
+		Name string `json:"name,omitempty"`
+	} `json:"type,omitempty"`
+	DisplayId string `json:"displayId,omitempty"`
+	Active    bool   `json:"active,omitempty"`
+}
+
+type DefaultReviewersResp struct {
+	ID                int        `json:"id"`
+	SourceRefMatcher  RefMatcher `json:"sourceRefMatcher,omitempty"`
+	TargetRefMatcher  RefMatcher `json:"targetRefMatcher,omitempty"`
+	Reviewers         []User     `json:"reviewers,omitempty"`
+	RequiredApprovals int        `json:"requiredApprovals"`
 }

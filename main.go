@@ -15,7 +15,9 @@ func main() {
 	pr := os.Getenv("pr")
 	// PR inputs
 	create_pr, _ := strconv.ParseBool(os.Getenv("create_pr"))
+	update_pr, _ := strconv.ParseBool(os.Getenv("update_pr"))
 	pr_title := os.Getenv("pr_title")
+	pr_description := os.Getenv("pr_description")
 	pr_source_branch := os.Getenv("pr_source_branch")
 	pr_target_branch := os.Getenv("pr_target_branch")
 	// PR comment inputs
@@ -46,25 +48,81 @@ func main() {
 		project_key,
 		repository_slug,
 	)
+	bitbucket_default_reviewers_url := fmt.Sprintf(
+		"%s/rest/default-reviewers/latest/projects/%s/repos/%s",
+		base_url,
+		project_key,
+		repository_slug,
+	)
 
+	new_pr_created := false
+	var pr_version int
 	if create_pr {
+		// Get default reviewers
+		fmt.Println("Requesting default reviewers")
+		default_reviewers, err := getPullRequestReviewers(access_token, bitbucket_default_reviewers_url, pr_target_branch, pr_source_branch)
+		if err != nil {
+			fmt.Println("Get default reviewers error:", err)
+		}
+
+		// Create pull request
 		req_body := PullRequest{
-			Title: pr_title,
+			Title:       pr_title,
+			Description: pr_description,
 			FromRef: Ref{
 				Id: "refs/heads/" + pr_source_branch,
 			},
 			ToRef: Ref{
 				Id: "refs/heads/" + pr_target_branch,
 			},
+			Reviewers: default_reviewers,
 		}
 		fmt.Println("Creating pull request")
-		pull_request, err := createPullRequest(access_token, bitbucket_url, req_body)
+		pull_request, result_code, err := createPullRequest(access_token, bitbucket_url, req_body)
 		if err != nil {
-			fmt.Println("Error:", err)
+			fmt.Println("Create pull request error:", err)
 			os.Exit(1)
+		}
+		if result_code != 409 {
+			new_pr_created = true
 		}
 		if pr == "" {
 			pr = strconv.Itoa(pull_request.Id)
+		}
+		pr_version = *pull_request.Version
+	}
+
+	// Only update pr if it already exists
+	if update_pr && !new_pr_created {
+		if pr == "" {
+			fmt.Println("Cannot update PR, missing id, make sure the given PR exists")
+			os.Exit(1)
+		}
+		// Get default reviewers
+		fmt.Println("Requesting default reviewers")
+		default_reviewers, err := getPullRequestReviewers(access_token, bitbucket_default_reviewers_url, pr_target_branch, pr_source_branch)
+		if err != nil {
+			fmt.Println("Get default reviewers error:", err)
+			err = nil
+		}
+
+		// Update pull request
+		req_body := PullRequest{
+			Version:     &pr_version,
+			Title:       pr_title,
+			Description: pr_description,
+			FromRef: Ref{
+				Id: "refs/heads/" + pr_source_branch,
+			},
+			ToRef: Ref{
+				Id: "refs/heads/" + pr_target_branch,
+			},
+			Reviewers: default_reviewers,
+		}
+		err = updatePullRequest(access_token, bitbucket_url, pr, req_body)
+		if err != nil {
+			fmt.Println("Update pull request error:", err)
+			os.Exit(1)
 		}
 	}
 
@@ -78,7 +136,7 @@ func main() {
 		fmt.Println("Requesting comments")
 		comments, err := getComments(access_token, bitbucket_url, pr)
 		if err != nil {
-			fmt.Println("Error:", err)
+			fmt.Println("Get comments error:", err)
 			os.Exit(1)
 		}
 
@@ -91,16 +149,15 @@ func main() {
 
 			// Update existing comment
 			req_body := AddComment{
+				Version:  existing_comment.Version,
 				Severity: pr_comment_severity,
 				State:    pr_comment_state,
 				Text:     pr_comment,
-				ID:       existing_comment.ID,
-				Version:  existing_comment.Version,
 			}
 			fmt.Println("Updating existing comment")
 			err = updateComment(access_token, bitbucket_url, pr, strconv.Itoa(existing_comment.ID), req_body)
 			if err != nil {
-				fmt.Println("Error:", err)
+				fmt.Println("Update comment error:", err)
 				os.Exit(1)
 			}
 		} else {
@@ -113,7 +170,7 @@ func main() {
 			fmt.Println("Adding comment")
 			err = addComment(access_token, bitbucket_url, pr, req_body)
 			if err != nil {
-				fmt.Println("Error:", err)
+				fmt.Println("Add comment error:", err)
 				os.Exit(1)
 			}
 		}

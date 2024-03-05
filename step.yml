@@ -98,10 +98,21 @@ inputs:
       summary: Whether to create a PR
       value_options: ["true", "false"]
       category: PR
+  - update_pr: "false"
+    opts:
+      title: Update PR
+      summary: Whether to update the PR if it already exists
+      value_options: ["true", "false"]
+      category: PR
   - pr_title:
     opts:
       title: Title
       summary: Title of the PR
+      category: PR
+  - pr_description:
+    opts:
+      title: Description
+      summary: Description of the PR
       category: PR
   - pr_source_branch: $BITRISE_GIT_BRANCH
     opts:

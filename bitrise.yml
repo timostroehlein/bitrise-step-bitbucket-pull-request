@@ -35,7 +35,9 @@ workflows:
         - repository_slug: $BITBUCKET_REPOSITORY_SLUG
         - pr: $BITBUCKET_PR
         - create_pr: true
+        - update_pr: true
         - pr_title: Bitrise Test PR
+        - pr_description: Bitrise Test Description
         - pr_source_branch: $BITRISE_GIT_BRANCH
         - pr_target_branch: main
   comment:
@@ -89,7 +91,9 @@ workflows:
         - repository_slug: $BITBUCKET_REPOSITORY_SLUG
         - pr: $BITBUCKET_PR
         - create_pr: true
+        - update_pr: true
         - pr_title: Bitrise Test PR
+        - pr_description: Bitrise Test Description
         - pr_source_branch: $BITRISE_GIT_BRANCH
         - pr_target_branch: main
         - create_pr_comment: true

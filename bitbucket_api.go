@@ -10,17 +10,17 @@ import (
 	"net/url"
 )
 
-func httpRequest(method string, access_token string, full_url string, request_body interface{}) ([]byte, error) {
+func httpRequest(method string, access_token string, full_url string, request_body interface{}) ([]byte, int, error) {
 	// Convert the request body to JSON
 	json_body, err := json.Marshal(request_body)
 	if err != nil {
-		return []byte{}, err
+		return []byte{}, 1, err
 	}
 
 	// Create the HTTP request
 	req, err := http.NewRequest(method, full_url, bytes.NewBuffer(json_body))
 	if err != nil {
-		return []byte{}, err
+		return []byte{}, 1, err
 	}
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", "Bearer "+access_token)
@@ -29,48 +29,60 @@ func httpRequest(method string, access_token string, full_url string, request_bo
 	client := http.DefaultClient
 	resp, err := client.Do(req)
 	if err != nil {
-		return []byte{}, err
+		return []byte{}, 1, err
 	}
 	defer resp.Body.Close()
 
 	// Handle the response
 	resp_body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return []byte{}, err
+		return []byte{}, 1, err
 	}
 	fmt.Println("Response Status:", resp.Status)
 	if resp.StatusCode >= 400 {
-		return []byte{}, errors.New(string(resp_body))
+		return []byte{}, resp.StatusCode, errors.New(string(resp_body))
 	}
-	return resp_body, nil
+	return resp_body, resp.StatusCode, nil
 }
 
-func createPullRequest(access_token string, base_url string, pull_request PullRequest) (PullRequest, error) {
+func createPullRequest(access_token string, base_url string, pull_request PullRequest) (PullRequest, int, error) {
 	create_pull_request_url := base_url + "/pull-requests"
-	resp_body, err := httpRequest("POST", access_token, create_pull_request_url, pull_request)
+	resp_body, result_code, err := httpRequest("POST", access_token, create_pull_request_url, pull_request)
 	if err != nil {
-		fmt.Println("Error:", err)
 		var bitbucket_error BitbucketError
 		err := json.Unmarshal([]byte(err.Error()), &bitbucket_error)
 		if err != nil {
-			return PullRequest{}, err
+			return PullRequest{}, result_code, err
 		}
 		if len(bitbucket_error.Errors) > 0 {
 			if bitbucket_error.Errors[0].ExistingPullRequest.Id != 0 {
 				fmt.Println("Skipping PR creation: already exists")
-				return bitbucket_error.Errors[0].ExistingPullRequest, nil
+				return bitbucket_error.Errors[0].ExistingPullRequest, result_code, nil
 			}
-			return PullRequest{}, errors.New(bitbucket_error.Errors[0].Message)
+			return PullRequest{}, result_code, errors.New(bitbucket_error.Errors[0].Message)
 		}
-		return PullRequest{}, err
+		return PullRequest{}, result_code, err
 	}
 
 	var pull_request_resp PullRequest
 	err = json.Unmarshal(resp_body, &pull_request_resp)
 	if err != nil {
-		return PullRequest{}, err
+		return PullRequest{}, result_code, err
 	}
-	return pull_request_resp, nil
+	return pull_request_resp, result_code, nil
+}
+
+func updatePullRequest(access_token string, base_url string, pull_request_id string, pull_request PullRequest) error {
+	update_pull_request_url := fmt.Sprintf(
+		"%s/pull-requests/%s",
+		base_url,
+		pull_request_id,
+	)
+	_, _, err := httpRequest("PUT", access_token, update_pull_request_url, pull_request)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func getComments(access_token string, base_url string, pull_request string) (AddCommentResp, error) {
@@ -87,7 +99,7 @@ func getComments(access_token string, base_url string, pull_request string) (Add
 	}
 	combined_url.RawQuery = params.Encode()
 
-	resp_body, err := httpRequest("GET", access_token, combined_url.String(), nil)
+	resp_body, _, err := httpRequest("GET", access_token, combined_url.String(), nil)
 	if err != nil {
 		return AddCommentResp{}, err
 	}
@@ -106,7 +118,7 @@ func addComment(access_token string, base_url string, pull_request string, comme
 		base_url,
 		pull_request,
 	)
-	_, err := httpRequest("POST", access_token, add_comment_url, comment)
+	_, _, err := httpRequest("POST", access_token, add_comment_url, comment)
 	if err != nil {
 		return err
 	}
@@ -120,9 +132,24 @@ func updateComment(access_token string, base_url string, pull_request string, co
 		pull_request,
 		comment_id,
 	)
-	_, err := httpRequest("PUT", access_token, update_comment_url, comment)
+	_, _, err := httpRequest("PUT", access_token, update_comment_url, comment)
 	if err != nil {
 		return err
 	}
 	return nil
+}
+
+func getDefaultReviewers(access_token string, base_url string) ([]DefaultReviewersResp, error) {
+	default_reviewers_url := base_url + "/conditions"
+	resp_body, _, err := httpRequest("GET", access_token, default_reviewers_url, nil)
+	if err != nil {
+		return []DefaultReviewersResp{}, err
+	}
+
+	var default_reviewers_resp []DefaultReviewersResp
+	err = json.Unmarshal(resp_body, &default_reviewers_resp)
+	if err != nil {
+		return []DefaultReviewersResp{}, err
+	}
+	return default_reviewers_resp, nil
 }

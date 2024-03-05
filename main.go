@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"strings"
 )
 
 func main() {
@@ -42,15 +43,16 @@ func main() {
 	}
 
 	// Create url
+	base_url_trimmed := strings.TrimRight(base_url, "/")
 	bitbucket_url := fmt.Sprintf(
 		"%s/rest/api/latest/projects/%s/repos/%s",
-		base_url,
+		base_url_trimmed,
 		project_key,
 		repository_slug,
 	)
 	bitbucket_default_reviewers_url := fmt.Sprintf(
 		"%s/rest/default-reviewers/latest/projects/%s/repos/%s",
-		base_url,
+		base_url_trimmed,
 		project_key,
 		repository_slug,
 	)

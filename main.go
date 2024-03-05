@@ -26,6 +26,19 @@ func main() {
 	pr_comment_match_string := os.Getenv("pr_comment_match_string")
 	pr_comment := os.Getenv("pr_comment")
 
+	if access_token == "" {
+		fmt.Println("Missing access token")
+		os.Exit(1)
+	}
+	if base_url == "" {
+		fmt.Println("Missing base url")
+		os.Exit(1)
+	}
+	if project_key == "" {
+		fmt.Println("Missing project key")
+		os.Exit(1)
+	}
+
 	// Create url
 	bitbucket_url := fmt.Sprintf(
 		"%s/rest/api/latest/projects/%s/repos/%s",

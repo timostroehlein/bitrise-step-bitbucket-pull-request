@@ -49,6 +49,7 @@ func createPullRequest(access_token string, base_url string, pull_request PullRe
 	create_pull_request_url := base_url + "/pull-requests"
 	resp_body, err := httpRequest("POST", access_token, create_pull_request_url, pull_request)
 	if err != nil {
+		fmt.Println("Error:", err)
 		var bitbucket_error BitbucketError
 		err := json.Unmarshal([]byte(err.Error()), &bitbucket_error)
 		if err != nil {
